@@ -1,60 +1,61 @@
 package main
 
 import (
-	"Go/simplecalc"
 	"fmt"
+	"strings"
+	"sync"
 )
 
-func main() {
-	fmt.Println("Hello world!")
 
-	a, b := 6, 4
-	fmt.Println(simplecalc.Add(a, b))
-
-	c, d := 15, 4
-	fmt.Println(simplecalc.Sub(c, d))
-
-	e, f := 14.0, 8.8
-	fmt.Println(simplecalc.Div(e, f))
-
-	g, h := 24, 8
-	fmt.Println(simplecalc.Mult(g, h))
-
-	num := 40
-	if num > 40 {
-		fmt.Println("Number is greater than 40")
-	} else if num == 40 {
-		fmt.Println("Number is exactly 40")
-	} else {
-		fmt.Println("Number is less than 40")
+func isPalindrome(s string) bool {
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		if r[i] != r[j] {
+			return false
+		}
 	}
-
-	day := "Wednesday"
-	switch day {
-	case "Wednesday":
-		fmt.Println("Weekday")
-	case "Saturday":
-		fmt.Println("Weekend")
-	default:
-		fmt.Println("It's another day")
-	}
-
-	fmt.Println("Counting from 1 to 9:")
-	for i := 1; i <= 9; i++ {
-		fmt.Println(i)
-	}
-
-	j := 8
-	fmt.Println("Before:", j)
-	increase(&j)
-	fmt.Println("After:", j)
-
-	defer fmt.Println("Second")
-	defer fmt.Println("Middle")
-	defer fmt.Println("First")
-
+	return true
 }
 
-func increase(num *int) {
-	*num = *num + 1
+
+func say(lang, text string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	fmt.Printf("%s: %s\n", lang, text)
+}
+
+func factorial(n uint64) uint64 {
+	var res uint64 = 1
+	for i := uint64(2); i <= n; i++ {
+		res *= i
+	}
+	return res
+}
+
+func main() {
+	fmt.Println(isPalindrome("level")) // true
+	fmt.Println(isPalindrome("hello")) // false
+
+	hellos := map[string]string{
+		"English": "Hello",
+		"Spanish": "Hola",
+		"French":  "Bonjour",
+		"Hindi":   "Namaste",
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(len(hellos))
+	for lang, text := range hellos {
+		go say(lang, text, &wg)
+	}
+	wg.Wait()
+
+	fmt.Println(factorial(5)) 
+	fmt.Println(factorial(10))
+
+	text := "Go is fun and Go is fast"
+	counts := map[string]int{}
+	for _, w := range strings.Fields(text) {
+		counts[strings.ToLower(w)]++
+	}
+	fmt.Println(counts) 
 }
